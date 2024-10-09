@@ -1,0 +1,47 @@
+{
+	"Name": "Json_exe´s Tools",
+	"Version": "0.1.0.0",
+	"Author": "Json_exe",
+	"Actions": [
+		{
+			"Name": "Self-Contained Marker",
+			"UUID": "com.json-exe.customstreammarkers.selfmarker",
+			"Icon": "imgs/actions/counter/icon",
+			"Tooltip": "Works like a clock that shows you the current stream time and allows you to long press it to create a marker (Alternative to Twitch Markers but less accurate).",
+			"PropertyInspectorPath": "ui/increment-counter.html",
+			"Controllers": [
+				"Keypad"
+			],
+			"States": [
+				{
+					"Image": "imgs/actions/counter/key",
+					"TitleAlignment": "middle"
+				}
+			]
+		}
+	],
+	"Category": "Json_exe´s Tools",
+	"CategoryIcon": "imgs/plugin/category-icon",
+	"CodePath": "bin/plugin.js",
+	"Description": "A plugin for creating stream markers using a timer and a text file.",
+	"Icon": "imgs/plugin/marketplace",
+	"SDKVersion": 2,
+	"Software": {
+		"MinimumVersion": "6.4"
+	},
+	"OS": [
+		{
+			"Platform": "mac",
+			"MinimumVersion": "10.15"
+		},
+		{
+			"Platform": "windows",
+			"MinimumVersion": "10"
+		}
+	],
+	"Nodejs": {
+		"Version": "20",
+		"Debug": "enabled"
+	},
+	"UUID": "com.json-exe.customstreammarkers"
+}
