@@ -1,5 +1,5 @@
 {
-	"Name": "Json_exe´s Tools",
+	"Name": "Json_exes Tools",
 	"Version": "0.1.0.0",
 	"Author": "Json_exe",
 	"Actions": [
@@ -20,7 +20,7 @@
 			]
 		}
 	],
-	"Category": "Json_exe´s Tools",
+	"Category": "Json_exes Tools",
 	"CategoryIcon": "imgs/plugin/category-icon",
 	"CodePath": "bin/plugin.js",
 	"Description": "A plugin for creating stream markers using a timer and a text file.",

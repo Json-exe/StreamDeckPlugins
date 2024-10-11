@@ -1,4 +1,4 @@
-import {
+import streamDeck, {
     action,
     KeyDownEvent,
     KeyUpEvent,
@@ -53,41 +53,44 @@ export class IncrementCounter extends SingletonAction<CounterSettings> {
     }
 
     override async onKeyUp(ev: KeyUpEvent<CounterSettings>): Promise<void> {
-        if (!this.keyDownStartTime) {
-            return;
-        }
-
-        const elapsedTime = Date.now() - this.keyDownStartTime;
+        const elapsedTime = Date.now() - (this.keyDownStartTime || 0);
+        streamDeck.logger.info(`Key up: ${elapsedTime}`);
         this.keyDownStartTime = undefined;
         const {settings} = ev.payload;
 
-        if (elapsedTime > IncrementCounter.longPressThreshold && settings.datafile) {
-            if (existsSync(settings.datafile)) {
-                await appendFile(settings.datafile, `${this.getElapsedTime(settings.startTimeStamp)} - ${settings.information}\n`, "utf-8");
-            }
+        if (elapsedTime > IncrementCounter.longPressThreshold) {
+            streamDeck.logger.info("Stopping timer!");
+            settings.startTimeStamp = undefined;
+            clearInterval(this.intervalId);
+            this.intervalId = undefined;
         } else {
             if (!settings.startTimeStamp) {
+                streamDeck.logger.info("Starting timer");
                 settings.startTimeStamp = Date.now();
-                // Clear the whole content of the data file if it exists.
                 if (settings.datafile && existsSync(settings.datafile)) {
-                    await appendFile(settings.datafile, "", { flag: "w" });
+                    await appendFile(settings.datafile, "", {flag: "w"});
                 }
-                
+
                 clearInterval(this.intervalId);
                 this.intervalId = setInterval(() => {
                     return ev.action.setTitle(`${this.getElapsedTime(settings.startTimeStamp)}`);
                 }, 1000);
             } else {
-                settings.startTimeStamp = undefined;
-                clearInterval(this.intervalId);
-                this.intervalId = undefined;
+                if (settings.datafile) {
+                    streamDeck.logger.info("Appending to file");
+                    if (existsSync(settings.datafile)) {
+                        await appendFile(settings.datafile, `${this.getElapsedTime(settings.startTimeStamp)} - ${settings.information}\n`, "utf-8");
+                    }
+                } else {
+                    streamDeck.logger.warn("No data file specified");
+                }
             }
-
-            // Update the current count in the action's settings, and change the title.
-            await ev.action.setSettings(settings);
-            const time = this.getElapsedTime(settings.startTimeStamp);
-            await ev.action.setTitle(`${time}`);
         }
+
+        // Update the current count in the action's settings, and change the title.
+        await ev.action.setSettings(settings);
+        const time = this.getElapsedTime(settings.startTimeStamp);
+        await ev.action.setTitle(`${time}`);
     }
 
     private getElapsedTime(startTime: number | undefined): string {
@@ -100,7 +103,7 @@ export class IncrementCounter extends SingletonAction<CounterSettings> {
         const hours = Math.floor(elapsed / (1000 * 60 * 60)) % 24;
 
         const pad = (num: number) => num.toString().padStart(2, "0");
-    
+
         return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
     }
 }
